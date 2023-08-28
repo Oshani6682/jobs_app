@@ -1,2 +1,16 @@
 server:
   port: 8080
+  servlet:
+    context-path: /api/jobs/v1
+spring:
+  jpa:
+    generate-ddl: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5Dialect
+  hibernate.ddl-auto: none
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/jobs_db
+    username: root
+    password: qwerty123
