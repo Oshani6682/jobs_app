@@ -51,6 +51,11 @@ public class UserService {
         return new UserDTO(saveUser(createUserDTO, UserRole.JOB_SEEKER));
     }
 
+    public List<ConsultantDTO> findAllConsultants() {
+        LOGGER.info("Find all users of type: consultant");
+        return consultantRepository.findAllConsultants();
+    }
+
     public ConsultantDTO saveConsultant(CreateConsultantDTO consultantDTO) {
         Optional<Sector> sector = sectorRepository.findById(consultantDTO.getSector());
         if (!sector.isPresent()) {
@@ -93,11 +98,6 @@ public class UserService {
         user = userRepository.save(user);
         LOGGER.info("Save new user - {}: {} - Successful", userRole.toString(), user.userName);
         return user;
-    }
-
-    public List findAllConsultants() {
-        LOGGER.info("Find all users of type: consultant");
-        return new ArrayList();
     }
 
 }

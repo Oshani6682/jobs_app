@@ -40,7 +40,7 @@ public class UserController {
     }
 
     @GetMapping("/consultants")
-    private ResponseEntity findConsultants() {
+    private ResponseEntity<List<ConsultantDTO>> findConsultants() {
         return ResponseEntity
             .ok()
             .body(userService.findAllConsultants());
