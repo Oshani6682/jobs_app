@@ -1,6 +1,7 @@
 package com.jobs.app.enums;
 
 public enum UserRole {
+
     MANAGER("manager"),
     ADMIN("admin"),
     JOB_SEEKER("jobSeeker"),
@@ -14,4 +15,5 @@ public enum UserRole {
     public String toString() {
         return role;
     }
+
 }

@@ -1,8 +1,10 @@
 package com.jobs.app.repository;
 
 import com.jobs.app.domain.User;
+import com.jobs.app.dto.UserDTO;
 import com.jobs.app.enums.UserRole;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -10,6 +12,7 @@ import java.util.List;
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
 
-    List<User> findAllUsersByUserRole(UserRole userRole);
+    @Query(value = "select new com.jobs.app.dto.UserDTO(user) from User user where user.userRole=:userRole")
+    List<UserDTO> findAllUsersByUserRole(UserRole userRole);
 
 }

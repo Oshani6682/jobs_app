@@ -1,5 +1,6 @@
 package com.jobs.app.domain;
 
+import com.jobs.app.dto.UserDTO;
 import com.jobs.app.enums.UserRole;
 
 import javax.persistence.*;
@@ -32,10 +33,19 @@ public class User {
     public String email;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "user_role")
+    @Column(name = "user_role", nullable = false)
     public UserRole userRole;
 
-    @Column(name = "is_active", nullable = false)
-    public Boolean isActive;
+    @Column(name = "is_active")
+    public Boolean isActive = true;
+
+    public User() {}
+
+    public User(UserDTO userDTO) {
+        firstName = userDTO.getFirstName();
+        lastName = userDTO.getLastName();
+        address = userDTO.getAddress();
+        email = userDTO.getEmail();
+    }
 
 }

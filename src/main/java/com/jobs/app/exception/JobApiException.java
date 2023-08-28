@@ -8,7 +8,7 @@ public class JobApiException extends RuntimeException {
     private final ErrorCodes errorCode;
     private final HttpStatus httpStatus;
 
-    protected JobApiException(
+    public JobApiException(
         String message,
         ErrorCodes errorCode,
         HttpStatus httpStatus
