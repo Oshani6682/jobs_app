@@ -21,8 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -98,6 +98,22 @@ public class UserService {
         user = userRepository.save(user);
         LOGGER.info("Save new user - {}: {} - Successful", userRole.toString(), user.userName);
         return user;
+    }
+
+    public ConsultantDTO findConsultantById(Integer id, HttpStatus statusOnNotFound) {
+        LOGGER.info("Find user - Consultant: {}", id);
+
+        ConsultantDTO consultant = consultantRepository.findConsultantById(id);
+        if (Objects.isNull(consultant)) {
+            throw new JobApiException(
+                "Consultant not found",
+                ErrorCodes.CONSULTANT_NOT_FOUND,
+                statusOnNotFound
+            );
+        }
+
+        LOGGER.info("Find user - Consultant: {}", id);
+        return consultant;
     }
 
 }

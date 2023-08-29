@@ -14,6 +14,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
@@ -32,7 +33,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     ResponseEntity<Object> handleConstraintViolationException(
         ConstraintViolationException exception
     ) {
-        SqlConstraints constraint = findMatchingConstraint(exception.getConstraintName());
+        String constraintName = exception.getConstraintName();
+        if (Objects.isNull(constraintName)) {
+            String [] constraints = exception.getSQLException().getMessage().split("CONSTRAINT|FOREIGN KEY");
+            constraintName = constraints[1].trim();
+            constraintName = constraintName.substring(1, constraintName.length() - 1);
+        }
+
+        SqlConstraints constraint = findMatchingConstraint(constraintName);
 
         return new ResponseEntity<Object>(
             generateErrorResponse(constraint.code, constraint.message),

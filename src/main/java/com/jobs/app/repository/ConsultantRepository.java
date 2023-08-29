@@ -14,4 +14,7 @@ public interface ConsultantRepository extends JpaRepository<Consultant, Integer>
     @Query("select new com.jobs.app.dto.ConsultantDTO(consultant) from Consultant consultant")
     List<ConsultantDTO> findAllConsultants();
 
+    @Query("select new com.jobs.app.dto.ConsultantDTO(consultant) from Consultant consultant where consultant.id=:consultantId")
+    ConsultantDTO findConsultantById(Integer consultantId);
+
 }
