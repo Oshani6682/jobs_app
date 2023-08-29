@@ -15,4 +15,8 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Query(value = "select new com.jobs.app.dto.UserDTO(user) from User user where user.userRole=:userRole")
     List<UserDTO> findAllUsersByUserRole(UserRole userRole);
 
+    @Query(value = "select new com.jobs.app.dto.UserDTO(user, true) from User user where user.userName=:username " +
+        "and user.password=:password")
+    UserDTO findUserByUsernameAndPassword(String username, String password);
+
 }

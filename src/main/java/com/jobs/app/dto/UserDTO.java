@@ -2,6 +2,7 @@ package com.jobs.app.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.jobs.app.domain.User;
+import com.jobs.app.enums.UserRole;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
@@ -27,6 +28,8 @@ public class UserDTO {
     )
     String email;
 
+    UserRole userRole;
+
     Boolean isActive;
 
     public UserDTO() {}
@@ -38,6 +41,13 @@ public class UserDTO {
         setAddress(user.address);
         setEmail(user.email);
         setActive(user.isActive);
+    }
+
+    public UserDTO(User user, boolean includeUserRole) {
+        this(user);
+        if (includeUserRole) {
+            this.userRole = user.userRole;
+        }
     }
 
     public Integer getId() {
@@ -80,12 +90,12 @@ public class UserDTO {
         this.email = email;
     }
 
-    public Boolean getActive() {
-        return isActive;
-    }
-
     public void setActive(Boolean active) {
         isActive = active;
+    }
+
+    public UserRole getUserRole() {
+        return userRole;
     }
 
 }

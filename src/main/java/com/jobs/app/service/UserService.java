@@ -4,10 +4,7 @@ import com.jobs.app.domain.Consultant;
 import com.jobs.app.domain.Country;
 import com.jobs.app.domain.Sector;
 import com.jobs.app.domain.User;
-import com.jobs.app.dto.ConsultantDTO;
-import com.jobs.app.dto.CreateConsultantDTO;
-import com.jobs.app.dto.CreateUserDTO;
-import com.jobs.app.dto.UserDTO;
+import com.jobs.app.dto.*;
 import com.jobs.app.enums.ErrorCodes;
 import com.jobs.app.enums.UserRole;
 import com.jobs.app.exception.JobApiException;
@@ -114,6 +111,23 @@ public class UserService {
 
         LOGGER.info("Find user - Consultant: {}", id);
         return consultant;
+    }
+
+    public UserDTO findUser(LoginDTO loginDTO) {
+        LOGGER.info("Find user by username - Started");
+
+        UserDTO userDTO = userRepository.findUserByUsernameAndPassword(
+            loginDTO.getUserName(), loginDTO.getPassword()
+        );
+
+        if (Objects.isNull(userDTO)) {
+            throw new JobApiException(
+                "Invalid user credentials", ErrorCodes.INVALID_USER_CREDENTIALS, HttpStatus.BAD_REQUEST
+            );
+        }
+
+        LOGGER.info("Find user by username: {} - Successful", userDTO.getFirstName());
+        return userDTO;
     }
 
 }
