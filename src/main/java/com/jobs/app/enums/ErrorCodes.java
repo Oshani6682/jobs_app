@@ -8,8 +8,10 @@ public enum ErrorCodes {
     COUNTRY_INVALID("CountryInvalid"),
     SECTOR_INVALID("SectorInvalid"),
     CONSULTANT_NOT_FOUND("ConsultantNotFound"),
+    JOB_SEEKER_NOT_FOUND("JobSeekerNotFound"),
     DAY_NOT_FOUND("DayNotFound"),
-    TIME_INVALID("TimeInvalid");
+    TIME_INVALID("TimeInvalid"),
+    DATE_INVALID("DateInvalid");
 
     private final String code;
     ErrorCodes(String code) {

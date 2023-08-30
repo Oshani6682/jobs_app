@@ -1,5 +1,6 @@
 package com.jobs.app.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.jobs.app.domain.User;
 import com.jobs.app.enums.UserRole;
@@ -28,6 +29,7 @@ public class UserDTO {
     )
     String email;
 
+    @JsonIgnore
     UserRole userRole;
 
     Boolean isActive;
