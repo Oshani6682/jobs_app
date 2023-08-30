@@ -42,10 +42,10 @@ public class User {
     public User() {}
 
     public User(UserDTO userDTO) {
-        firstName = userDTO.getFirstName();
-        lastName = userDTO.getLastName();
-        address = userDTO.getAddress();
-        email = userDTO.getEmail();
+        firstName = userDTO.getFirstName().trim();
+        lastName = userDTO.getLastName().trim();
+        address = userDTO.getAddress().trim();
+        email = userDTO.getEmail().trim();
     }
 
 }

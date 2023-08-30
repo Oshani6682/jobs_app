@@ -2,6 +2,7 @@ package com.jobs.app.util;
 
 import com.jobs.app.domain.User;
 import com.jobs.app.enums.UserRole;
+import org.springframework.util.StringUtils;
 
 import java.math.BigInteger;
 import java.text.DateFormat;
@@ -14,6 +15,15 @@ public class Utils {
     private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     private Utils() {}
+
+    public static String capitalizeEachLetter(String text) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (String subString : text.toLowerCase().split(" ")) {
+            stringBuilder.append(StringUtils.capitalize(subString))
+                .append(" ");
+        }
+        return stringBuilder.toString().trim();
+    }
 
     public static UserRole findMatchingUserRole(String userRole) {
         for (UserRole value : UserRole.values()) {

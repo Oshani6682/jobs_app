@@ -4,7 +4,8 @@ public enum SqlConstraints {
 
     USER_NAME_UNIQUE("user.user_name_unique_idx", "UserNameNotUnique", "User name already exists"),
     CONSULTANT_NOT_FOUND("fk_consultant_has_day_type_consultant1", "ConsultantNotFound", "Consultant not found"),
-    DAY_NOT_FOUND("fk_consultant_has_day_type_day_type1", "DayNotFound", "Day not found");
+    DAY_NOT_FOUND("fk_consultant_has_day_type_day_type1", "DayNotFound", "Day not found"),
+    COUNTRY_NOT_UNIQUE("country.country_UNIQUE", "CountryInvalid", "Country already exists");
 
     public final String constraint;
     public final String code;
