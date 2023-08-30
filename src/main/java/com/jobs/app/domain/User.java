@@ -2,6 +2,7 @@ package com.jobs.app.domain;
 
 import com.jobs.app.dto.UserDTO;
 import com.jobs.app.enums.UserRole;
+import com.jobs.app.util.Utils;
 
 import javax.persistence.*;
 
@@ -42,8 +43,8 @@ public class User {
     public User() {}
 
     public User(UserDTO userDTO) {
-        firstName = userDTO.getFirstName().trim();
-        lastName = userDTO.getLastName().trim();
+        firstName = Utils.capitalizeEachLetter(userDTO.getFirstName());
+        lastName = Utils.capitalizeEachLetter(userDTO.getLastName());
         address = userDTO.getAddress().trim();
         email = userDTO.getEmail().trim();
     }

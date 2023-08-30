@@ -7,6 +7,7 @@ public enum ErrorCodes {
     USER_NAME_NOT_UNIQUE("UserNameNotUnique"),
     COUNTRY_INVALID("CountryInvalid"),
     SECTOR_INVALID("SectorInvalid"),
+    JOB_INVALID("JobInvalid"),
     CONSULTANT_NOT_FOUND("ConsultantNotFound"),
     JOB_SEEKER_NOT_FOUND("JobSeekerNotFound"),
     DAY_NOT_FOUND("DayNotFound"),
