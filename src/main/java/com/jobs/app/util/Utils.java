@@ -5,6 +5,7 @@ import com.jobs.app.enums.UserRole;
 
 import java.math.BigInteger;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -21,6 +22,14 @@ public class Utils {
             }
         }
         return null;
+    }
+
+    public static Date convertStringToDate(String dateString) {
+        try {
+            return dateFormat.parse(dateString);
+        } catch (ParseException exception) {
+            return null;
+        }
     }
 
     public static String getDisplayName(User user) {

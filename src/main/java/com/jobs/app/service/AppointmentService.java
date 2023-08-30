@@ -2,11 +2,13 @@ package com.jobs.app.service;
 
 import com.jobs.app.domain.Appointment;
 import com.jobs.app.dto.AppointmentDTO;
+import com.jobs.app.dto.ConsultantAvailabilityDTO;
 import com.jobs.app.dto.CreateAppointmentDTO;
 import com.jobs.app.enums.AppointmentStatus;
 import com.jobs.app.enums.ErrorCodes;
 import com.jobs.app.exception.JobApiException;
 import com.jobs.app.repository.AppointmentRepository;
+import com.jobs.app.repository.ConsultantAvailabilityRepository;
 import com.jobs.app.repository.ConsultantRepository;
 import com.jobs.app.repository.UserRepository;
 import com.jobs.app.util.Utils;
@@ -17,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -24,6 +27,9 @@ import java.util.List;
 public class AppointmentService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AppointmentService.class);
+
+    @Autowired
+    private ConsultantAvailabilityRepository consultantAvailabilityRepository;
 
     @Autowired
     private ConsultantRepository consultantRepository;
@@ -43,7 +49,7 @@ public class AppointmentService {
         int startTimeCode = Utils.convertTimeToIntValue(createAppointmentDTO.getFromTime());
         int endTimeCode = Utils.convertTimeToIntValue(createAppointmentDTO.getToTime());
 
-        if (appointmentDate.compareTo(todayDate) < 0) {
+        if (appointmentDate.compareTo(todayDate) <= 0) {
             throw new JobApiException(
                 "Appointment date is invalid", ErrorCodes.TIME_INVALID, HttpStatus.BAD_REQUEST
             );
@@ -52,6 +58,37 @@ public class AppointmentService {
                 "Appointment times are invalid", ErrorCodes.TIME_INVALID, HttpStatus.BAD_REQUEST
             );
         }
+
+        Date date = Utils.convertStringToDate(Utils.convertDateBigIntValueToDate(appointmentDate));
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+
+        List<ConsultantAvailabilityDTO> availabilityDTOS = consultantAvailabilityRepository.findAllByConsultantAndDayIncludingCode(
+            createAppointmentDTO.getConsultant(), calendar.get(Calendar.DAY_OF_WEEK)
+        );
+
+        if (availabilityDTOS.isEmpty()) {
+            throw new JobApiException(
+                "Consultant not available on selected day", ErrorCodes.CONSULTANT_NOT_AVAILABLE, HttpStatus.BAD_REQUEST
+            );
+        }
+
+        availabilityDTOS.forEach(
+            availability -> {
+                int fromCode = availability.getAvailableFromCode();
+                int toCode = availability.getAvailableToCode();
+
+                if (
+                    startTimeCode < fromCode ||
+                    startTimeCode > toCode   ||
+                    endTimeCode > toCode
+                ) {
+                    throw new JobApiException(
+                        "Appointment time not in between consultant available time", ErrorCodes.APPOINTMENT_TIME_INVALID, HttpStatus.BAD_REQUEST
+                    );
+                }
+            }
+        );
 
         appointmentRepository.findAllAppointmentsOfConsultantAndDate(createAppointmentDTO.getConsultant(), appointmentDate).forEach(
             appointmentDTO -> {

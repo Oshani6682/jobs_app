@@ -11,7 +11,9 @@ public enum ErrorCodes {
     JOB_SEEKER_NOT_FOUND("JobSeekerNotFound"),
     DAY_NOT_FOUND("DayNotFound"),
     TIME_INVALID("TimeInvalid"),
-    DATE_INVALID("DateInvalid");
+    DATE_INVALID("DateInvalid"),
+    CONSULTANT_NOT_AVAILABLE("ConsultantNotAvailable"),
+    APPOINTMENT_TIME_INVALID("AppointmentTimeInvalid");
 
     private final String code;
     ErrorCodes(String code) {
