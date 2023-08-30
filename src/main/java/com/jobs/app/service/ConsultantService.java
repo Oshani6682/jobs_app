@@ -7,6 +7,7 @@ import com.jobs.app.enums.ErrorCodes;
 import com.jobs.app.exception.JobApiException;
 import com.jobs.app.repository.ConsultantAvailabilityRepository;
 import com.jobs.app.repository.DayRepository;
+import com.jobs.app.util.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,8 +36,8 @@ public class ConsultantService {
 
         int consultant = Integer.parseInt(availabilityDTO.getConsultant());
         int day = Integer.parseInt(availabilityDTO.getDay());
-        int availableFromCode = Integer.parseInt(availabilityDTO.getAvailableFrom().replace(":", ""));
-        int availableToCode = Integer.parseInt(availabilityDTO.getAvailableTo().replace(":", ""));;
+        int availableFromCode = Utils.convertTimeToIntValue(availabilityDTO.getAvailableFrom());
+        int availableToCode = Utils.convertTimeToIntValue(availabilityDTO.getAvailableTo());
 
         if (availableFromCode >= availableToCode) {
             throw new JobApiException(

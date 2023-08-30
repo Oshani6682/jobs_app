@@ -2,6 +2,7 @@ package com.jobs.app.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.jobs.app.domain.ConsultantAvailability;
+import com.jobs.app.util.Utils;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -51,8 +52,8 @@ public class ConsultantAvailabilityDTO {
         Integer availableFrom = availability.availableFrom;
         Integer availableTo = availability.availableTo;
 
-        setAvailableFrom(availableFrom.toString().substring(0, 2) + ":" + availableFrom.toString().substring(2, 4));
-        setAvailableTo(availableTo.toString().substring(0, 2) + ":" + availableTo.toString().substring(2, 4));
+        setAvailableFrom(Utils.convertTimeIntValueToTime(availableFrom));
+        setAvailableTo(Utils.convertTimeIntValueToTime(availableTo));
 
         if (includeTimeIntValue) {
             setAvailableFromCode(availableFrom);

@@ -15,4 +15,13 @@ public class Utils {
         return null;
     }
 
+    public static int convertTimeToIntValue(String timeCode) {
+        return Integer.parseInt(timeCode.replace(":", ""));
+    }
+
+    public static String convertTimeIntValueToTime(Integer timeInInt) {
+        String timeInString = timeInInt.toString();
+        return timeInString.substring(0, 2) + ":" + timeInString.substring(2, 4);
+    }
+
 }
