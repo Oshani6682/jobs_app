@@ -1,11 +1,13 @@
 package com.jobs.app.service;
 
 import com.jobs.app.domain.Appointment;
+import com.jobs.app.domain.User;
 import com.jobs.app.dto.AppointmentDTO;
 import com.jobs.app.dto.ConsultantAvailabilityDTO;
 import com.jobs.app.dto.CreateAppointmentDTO;
 import com.jobs.app.enums.AppointmentStatus;
 import com.jobs.app.enums.ErrorCodes;
+import com.jobs.app.enums.UserRole;
 import com.jobs.app.exception.JobApiException;
 import com.jobs.app.repository.AppointmentRepository;
 import com.jobs.app.repository.ConsultantAvailabilityRepository;
@@ -140,6 +142,17 @@ public class AppointmentService {
 
     public List<AppointmentDTO> findAppointments() {
         LOGGER.info("Find appointments - Started");
+        return appointmentRepository.findAllAppointments();
+    }
+
+    public List<AppointmentDTO> findAppointments(int userId) {
+        LOGGER.info("Find appointments - Started");
+        User user = userRepository.findById(userId).get();
+        if (user.userRole == UserRole.JOB_SEEKER) {
+            return appointmentRepository.findAllAppointmentsOfJobSeeker(userId);
+        } else if (user.userRole == UserRole.CONSULTANT) {
+            return appointmentRepository.findAllAppointmentsOfConsultant(userId);
+        }
         return appointmentRepository.findAllAppointments();
     }
 

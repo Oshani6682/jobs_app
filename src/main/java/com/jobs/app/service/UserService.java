@@ -117,7 +117,7 @@ public class UserService {
         LOGGER.info("Find user by username - Started");
 
         UserDTO userDTO = userRepository.findUserByUsernameAndPassword(
-            loginDTO.getUserName(), loginDTO.getPassword()
+            loginDTO.getUsername(), loginDTO.getPassword()
         );
 
         if (Objects.isNull(userDTO)) {
