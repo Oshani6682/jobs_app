@@ -19,4 +19,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
         "and user.password=:password")
     UserDTO findUserByUsernameAndPassword(String username, String password);
 
+    @Query(value = "select new com.jobs.app.dto.UserDTO(user, true) from User user where user.userName=:username")
+    UserDTO findUserByUsername(String username);
+
 }

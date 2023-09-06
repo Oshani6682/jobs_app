@@ -80,15 +80,15 @@ public class UserService {
         consultant.country = country.get();
 
         consultant = consultantRepository.save(consultant);
-        LOGGER.info("Save Consultant: {} - Successful", consultantDTO.getUserName());
+        LOGGER.info("Save Consultant: {} - Successful", consultantDTO.getUsername());
 
         return new ConsultantDTO(consultant);
     }
 
     private User saveUser(CreateUserDTO userDTO, UserRole userRole) {
-        LOGGER.info("Save new user - {}: {}", userRole.toString(), userDTO.getUserName());
+        LOGGER.info("Save new user - {}: {}", userRole.toString(), userDTO.getUsername());
         User user = new User(userDTO);
-        user.userName = userDTO.getUserName();
+        user.userName = userDTO.getUsername();
         user.password = userDTO.getPassword();
         user.userRole = userRole;
 
