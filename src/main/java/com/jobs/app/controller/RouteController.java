@@ -1,8 +1,10 @@
 package com.jobs.app.controller;
 
+import com.jobs.app.domain.User;
 import com.jobs.app.dto.CreateUserDTO;
 import com.jobs.app.dto.LoginDTO;
 import com.jobs.app.dto.UserDTO;
+import com.jobs.app.enums.UserRole;
 import com.jobs.app.repository.UserRepository;
 import com.jobs.app.service.AppointmentService;
 import com.jobs.app.service.UserService;
@@ -15,7 +17,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.thymeleaf.util.StringUtils;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 @Controller
 public class RouteController {
@@ -49,9 +54,27 @@ public class RouteController {
         @PathVariable Integer userId,
         Model model
     ) {
-        model.addAttribute("userId", userId);
+        String result = getBase(model, userId);
+        if (Objects.nonNull(result)) {
+            return result;
+        }
+
         model.addAttribute("appointments", appointmentService.findAppointments(userId));
         return "user-dashboard";
+    }
+
+    @RequestMapping(value = "/consultants-view/{userId}")
+    private String consultantView(
+        @PathVariable Integer userId,
+        Model model
+    ) {
+        String result = getBase(model, userId);
+        if (Objects.nonNull(result)) {
+            return result;
+        }
+
+        model.addAttribute("consultants", userService.findAllConsultants());
+        return "consultants-view";
     }
 
     @PostMapping(value = "/create-user")
@@ -97,6 +120,26 @@ public class RouteController {
 
         userService.saveJobSeeker(createUserDTO);
         return "redirect:/";
+    }
+
+    private String getBase(Model model, Integer userId) {
+        Optional<User> user = userRepository.findById(userId);
+        if (!user.isPresent()) {
+            return "redirect:/";
+        }
+
+        User userData = user.get();
+        setPermissions(model, userData);
+
+        model.addAttribute("userId", userId);
+        model.addAttribute("user", new UserDTO(userData, true));
+        return null;
+    }
+
+    private void setPermissions(Model model, User user) {
+        Map<String, Boolean> permissions = new HashMap<>();
+        permissions.put("hasConsultantView", user.userRole != UserRole.CONSULTANT);
+        model.addAttribute("permissions", permissions);
     }
 
 }

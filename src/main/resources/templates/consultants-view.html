@@ -78,20 +78,16 @@
   <table class="table table-bordered table-hover">
     <thead class="table-dark">
     <tr>
-      <th>Consultant</th>
-      <th>Job Seeker</th>
-      <th>Appointment Date</th>
-      <th>Time period</th>
-      <th>Status</th>
+      <th>Consultant name</th>
+      <th>Country of residence</th>
+      <th>Sector</th>
     </tr>
     </thead>
     <tbody>
-    <tr th:each = "appointment : ${appointments}">
-      <td th:text = "${appointment.consultant}"></td>
-      <td th:text = "${appointment.jobSeeker}"></td>
-      <td th:text = "${appointment.appointmentDate}"></td>
-      <td th:text = "${appointment.startTime + ' to ' + appointment.endTime}"></td>
-      <td th:text = "${appointment.status}"></td>
+    <tr th:each = "consultant : ${consultants}">
+      <td th:text = "${consultant.firstName + ' ' + consultant.lastName}"></td>
+      <td th:text = "${consultant.country}"></td>
+      <td th:text = "${consultant.sector}"></td>
     </tr>
     </tbody>
   </table>
