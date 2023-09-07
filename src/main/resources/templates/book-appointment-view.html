@@ -1,0 +1,88 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<head>
+  <title>Title</title>
+</head>
+<body>
+<div id="Appointment">
+  <div th:if="${isError}">
+    <div class="alert alert-danger" th:text="${errorMsg}">Invalid Email or Password</div>
+  </div>
+
+  <h3 class="text-center text-white pt-5">Create Appointment</h3>
+  <div class="container">
+    <div id="login-row" class="row justify-content-center align-items-center">
+      <div id="login-column" class="col-md-6" style="margin-top: -2%">
+        <div id="login-box" class="col-md-12" style="margin-top: -2%">
+
+          <form
+              id="login-form" class="form"
+              th:action="@{${'/confirm-appointment?jobSeeker=' + userId + '&consultant=' + consultant.id}}" method="post"
+              th:object="${appointmentDTO}"
+          >
+
+            <h3 class="text-center text-info" style="margin-top: -2%">Make Appointment</h3>
+
+            <br>
+            <br>
+
+            <div class="form-group">
+              <label class="text-info">Consultant:</label>
+              <br>
+              <label th:text="${consultant.firstName + ' ' + consultant.lastName}">user</label>
+              <br>
+            </div>
+
+            <div class="form-group">
+              <label class="text-info">Available Days: </label>
+              <br>
+              <label th:if="${#lists.size(consultantAvailabilities)==0}">Consultant not available, Please select another consultant!</label>
+              <table class="table table-bordered table-hover" th:if="${#lists.size(consultantAvailabilities)>0}">
+                <thead class="table-dark">
+                <tr>
+                  <th>Day</th>
+                  <th>From time</th>
+                  <th>To time</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each = "availability : ${consultantAvailabilities}">
+                  <td th:text = "${availability.day}"></td>
+                  <td th:text = "${availability.availableFrom}"></td>
+                  <td th:text = "${availability.availableTo}"></td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="form-group">
+              <label for="day" class="text-info">Date:</label><br>
+              <label>
+                <input th:field="*{appointmentDate}" type="date" name="day"  id="day"/>
+              </label>
+            </div>
+            <div class="form-group">
+              <label for="From" class="text-info">From:</label><br>
+              <input th:field="*{fromTime}" type="text" name="password" id="From" class="form-control">
+            </div>
+            <div class="form-group">
+              <label for="To" class="text-info">To:</label><br>
+              <input th:field="*{toTime}" type="text" name="password" id="To" class="form-control">
+            </div>
+
+            <div class="form-group">
+
+              <input th:if="${#lists.size(consultantAvailabilities)>0}" type="submit" name="CreateAccount" class="btn btn-info btn-md" value="Confirm Appointment">
+            </div>
+
+          </form>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

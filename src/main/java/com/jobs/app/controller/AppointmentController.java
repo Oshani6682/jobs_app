@@ -24,7 +24,7 @@ public class AppointmentController {
         @RequestBody @Validated CreateAppointmentDTO appointmentDTO
     ) {
         return new ResponseEntity<AppointmentDTO>(
-            appointmentService.saveAppointment(appointmentDTO),
+            appointmentService.saveAppointment(null, appointmentDTO),
             HttpStatus.CREATED
         );
     }

@@ -40,7 +40,7 @@ public class CreateAppointmentDTO {
     )
     @Pattern(
         regexp = "^([0-1][0-9]|2[0-4]):([0-5][0-9])$",
-        message = "TimeInvalid#Appointment start time is invalid. Time format should be in 24 hrs (HH:MM)"
+        message = "TimeInvalid#Appointment start time is invalid. Time format should be in 24 hrs (HH:mm)"
     )
     String fromTime;
 
@@ -49,7 +49,7 @@ public class CreateAppointmentDTO {
     )
     @Pattern(
         regexp = "^([0-1][0-9]|2[0-4]):([0-5][0-9])$",
-        message = "TimeInvalid#Appointment end time is invalid. Time format should be in 24 hrs (HH:MM)"
+        message = "TimeInvalid#Appointment end time is invalid. Time format should be in 24 hrs (HH:mm)"
     )
     String toTime;
 

@@ -81,6 +81,7 @@
       <th>Consultant name</th>
       <th>Country of residence</th>
       <th>Sector</th>
+      <th></th>
     </tr>
     </thead>
     <tbody>
@@ -88,6 +89,9 @@
       <td th:text = "${consultant.firstName + ' ' + consultant.lastName}"></td>
       <td th:text = "${consultant.country}"></td>
       <td th:text = "${consultant.sector}"></td>
+      <td th:if = "${permissions.canBookAppointment}">
+        <a class="btn btn-info btn-md" th:href="@{${'/book-appointment?jobSeeker=' + userId + '&consultant=' + consultant.id}}">Book Appointment</a>
+      </td>
     </tr>
     </tbody>
   </table>
