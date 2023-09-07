@@ -1,7 +1,9 @@
 package com.jobs.app.controller;
 
+import com.jobs.app.domain.ConsultantAvailability;
 import com.jobs.app.domain.User;
 import com.jobs.app.dto.*;
+import com.jobs.app.enums.AppointmentStatus;
 import com.jobs.app.enums.UserRole;
 import com.jobs.app.repository.ConsultantAvailabilityRepository;
 import com.jobs.app.repository.ConsultantRepository;
@@ -18,10 +20,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.thymeleaf.util.StringUtils;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Controller
 public class RouteController {
@@ -84,6 +83,72 @@ public class RouteController {
 
         model.addAttribute("consultants", userService.findAllConsultants());
         return "consultants-view";
+    }
+
+    @RequestMapping(value = "/consultant-availability")
+    private String getConsultantAvailabilityView(
+        @RequestParam Integer user,
+        Model model
+    ) {
+        String result = getBase(model, user);
+        if (Objects.nonNull(result)) {
+            return result;
+        }
+
+        model.addAttribute("availabilities", availabilityRepository.findAllByConsultantAndDayExcludingCode(user));
+        return "availability-view";
+    }
+
+    @RequestMapping(value = "/cancel-availability")
+    private String getConsultantAvailabilityView(
+        @RequestParam Integer user,
+        @RequestParam Integer availability,
+        Model model
+    ) {
+        String result = getBase(model, user);
+        if (Objects.nonNull(result)) {
+            return result;
+        }
+
+        User matchUser = userRepository.findById(user).get();
+        if (matchUser.userRole != UserRole.CONSULTANT) {
+            return "redirect:/";
+        }
+
+        Optional<ConsultantAvailability> matchAvailability = availabilityRepository.findById(availability);
+        if (!matchAvailability.isPresent()) {
+            return "redirect:/";
+        }
+        ConsultantAvailability consultantAvailability = matchAvailability.get();
+
+        boolean isError = false;
+        String errorMsg = "";
+
+        Calendar calendar = Calendar.getInstance();
+        for (AppointmentDTO appointment : appointmentService.findAppointments(user)) {
+            if (appointment.getStatus().contentEquals(AppointmentStatus.scheduled.name())
+                || appointment.getStatus().contentEquals(AppointmentStatus.started.name())) {
+                String [] dateSplit = appointment.getAppointmentDate().split("-");
+                calendar.set(Calendar.YEAR, Integer.parseInt(dateSplit[0]));
+                calendar.set(Calendar.MONTH, Integer.parseInt(dateSplit[1]) - 1);
+                calendar.set(Calendar.DATE, Integer.parseInt(dateSplit[2]));
+
+                if (calendar.get(Calendar.DAY_OF_WEEK) == consultantAvailability.day.id) {
+                    isError = true;
+                    errorMsg = "Availability cannot be deleted, as there are pending appointments";
+                    break;
+                }
+            }
+        }
+
+        if (isError) {
+            includeError(model, true, errorMsg);
+        } else {
+            availabilityRepository.deleteById(availability);
+        }
+
+        model.addAttribute("availabilities", availabilityRepository.findAllByConsultantAndDayExcludingCode(user));
+        return "availability-view";
     }
 
     @RequestMapping(value = "/book-appointment")
@@ -338,6 +403,7 @@ public class RouteController {
         permissions.put("canBookAppointment", user.userRole == UserRole.JOB_SEEKER);
         permissions.put("canCancelAppointment", user.userRole == UserRole.JOB_SEEKER || user.userRole == UserRole.CONSULTANT);
         permissions.put("canCreateUsers", user.userRole == UserRole.ADMIN);
+        permissions.put("canAddAvailability", user.userRole == UserRole.CONSULTANT);
         model.addAttribute("permissions", permissions);
     }
 

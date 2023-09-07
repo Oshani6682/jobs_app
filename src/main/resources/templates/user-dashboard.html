@@ -68,6 +68,9 @@
   <a th:if="${permissions.hasConsultantView}" th:href="@{${'/consultants-view/' + userId}}">Consultants</a>
 
   <a th:if="${permissions.canCreateUsers}" th:href="@{${'/register-user?user=' + userId + '&userRole=consultant'}}">Create Consultant</a>
+
+  <a th:if="${permissions.canAddAvailability}" th:href="@{${'/consultant-availability?user=' + userId}}">My Availability</a>
+
   <a th:if="${user.userRole=='MANAGER'}" href="#">Clients</a>
   <a th:if="${user.userRole=='MANAGER'}" href="#">Contact</a>
 </div>
@@ -99,7 +102,7 @@
       <td th:text = "${appointment.startTime + ' to ' + appointment.endTime}"></td>
       <td th:text = "${appointment.status}"></td>
       <td th:if = "${permissions.canCancelAppointment && appointment.status=='scheduled'}">
-        <a th:href="@{${'/cancel-appointment?user=' + userId + '&appointment=' + appointment.id}}" class="btn btn-info btn-md">Cancel</a>
+        <a th:href="@{${'/cancel-appointment?user=' + userId + '&appointment=' + appointment.id}}" class="btn btn-danger btn-md">Cancel</a>
       </td>
       <td th:if = "${permissions.canCancelAppointment && appointment.status!='scheduled'}">
       </td>
