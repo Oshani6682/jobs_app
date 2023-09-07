@@ -13,8 +13,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -31,7 +33,7 @@ public class ConsultantService {
     @Autowired
     private DayRepository dayRepository;
 
-    public ConsultantAvailabilityDTO saveConsultantAvailability(ConsultantAvailabilityDTO availabilityDTO) {
+    public ConsultantAvailabilityDTO saveConsultantAvailability(Model model, ConsultantAvailabilityDTO availabilityDTO) {
         LOGGER.info("Save consultant availability: Consultant {}", availabilityDTO.getConsultant());
 
         int consultant = Integer.parseInt(availabilityDTO.getConsultant());
@@ -40,6 +42,9 @@ public class ConsultantService {
         int availableToCode = Utils.convertTimeToIntValue(availabilityDTO.getAvailableTo());
 
         if (availableFromCode >= availableToCode) {
+            if (includeError(model, "Availability from time is ahead of available till time")) {
+                return null;
+            }
             throw new JobApiException(
                 "Availability times are invalid", ErrorCodes.TIME_INVALID, HttpStatus.BAD_REQUEST
             );
@@ -49,21 +54,25 @@ public class ConsultantService {
             consultant, day
         );
 
-        availabilities.forEach(
-            availability -> {
-                int fromCode = availability.getAvailableFromCode();
-                int toCode = availability.getAvailableToCode();
-                if (availableFromCode <= fromCode && availableToCode > fromCode) {
-                    throw new JobApiException(
-                        "Overlaps existing available time", ErrorCodes.TIME_INVALID, HttpStatus.BAD_REQUEST
-                    );
-                } else if (availableFromCode >= fromCode && availableFromCode < toCode) {
-                    throw new JobApiException(
-                        "Overlaps existing available time", ErrorCodes.TIME_INVALID, HttpStatus.BAD_REQUEST
-                    );
+        for (ConsultantAvailabilityDTO availability : availabilities) {
+            int fromCode = availability.getAvailableFromCode();
+            int toCode = availability.getAvailableToCode();
+            if (availableFromCode <= fromCode && availableToCode > fromCode) {
+                if (includeError(model, "Overlaps existing available time")) {
+                    return null;
                 }
+                throw new JobApiException(
+                    "Overlaps existing available time", ErrorCodes.TIME_INVALID, HttpStatus.BAD_REQUEST
+                );
+            } else if (availableFromCode >= fromCode && availableFromCode < toCode) {
+                if (includeError(model, "Overlaps existing available time")) {
+                    return null;
+                }
+                throw new JobApiException(
+                    "Overlaps existing available time", ErrorCodes.TIME_INVALID, HttpStatus.BAD_REQUEST
+                );
             }
-        );
+        }
 
         Optional<Day> matchedDay = dayRepository.findById(day);
 
@@ -85,6 +94,16 @@ public class ConsultantService {
         LOGGER.info("Find consultant availability: {} - Started", consultantId);
         userService.findConsultantById(consultantId, HttpStatus.BAD_REQUEST);
         return consultantAvailabilityRepository.findAllByConsultantAndDayExcludingCode(consultantId);
+    }
+
+    private boolean includeError(Model model, String errorMsg) {
+        if (Objects.isNull(model)) {
+            return false;
+        }
+
+        model.addAttribute("isError", true);
+        model.addAttribute("errorMsg", errorMsg);
+        return true;
     }
 
 }

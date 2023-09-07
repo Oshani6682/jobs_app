@@ -25,7 +25,7 @@ public class ConsultantController {
     ) {
         availabilityDTO.setConsultant(String.valueOf(consultantId));
         return new ResponseEntity<ConsultantAvailabilityDTO>(
-            consultantService.saveConsultantAvailability(availabilityDTO),
+            consultantService.saveConsultantAvailability(null, availabilityDTO),
             HttpStatus.CREATED
         );
     }

@@ -104,22 +104,27 @@ public class AppointmentService {
             );
         }
 
+        boolean matchFound = false;
         for (ConsultantAvailabilityDTO availability : availabilityDTOS) {
             int fromCode = availability.getAvailableFromCode();
             int toCode = availability.getAvailableToCode();
 
-            if (startTimeCode < fromCode ||
-                startTimeCode > toCode   ||
-                endTimeCode > toCode
+            if (startTimeCode >= fromCode &&
+                endTimeCode <= toCode
             ) {
-                if (includeError(model, "Appointment time not in between consultant available time")) {
-                    return null;
-                }
-
-                throw new JobApiException(
-                    "Appointment time not in between consultant available time", ErrorCodes.APPOINTMENT_TIME_INVALID, HttpStatus.BAD_REQUEST
-                );
+                matchFound = true;
+                break;
             }
+        }
+
+        if (!matchFound) {
+            if (includeError(model, "Appointment time not in between consultant available time")) {
+                return null;
+            }
+
+            throw new JobApiException(
+                "Appointment time not in between consultant available time", ErrorCodes.APPOINTMENT_TIME_INVALID, HttpStatus.BAD_REQUEST
+            );
         }
 
         for (AppointmentDTO appointmentDTO : appointmentRepository.findAllAppointmentsOfConsultantAndDate(createAppointmentDTO.getConsultant(), appointmentDate)) {

@@ -6,12 +6,9 @@ import com.jobs.app.dto.*;
 import com.jobs.app.enums.AppointmentStatus;
 import com.jobs.app.enums.UserRole;
 import com.jobs.app.repository.ConsultantAvailabilityRepository;
-import com.jobs.app.repository.ConsultantRepository;
+import com.jobs.app.repository.DayRepository;
 import com.jobs.app.repository.UserRepository;
-import com.jobs.app.service.AppointmentService;
-import com.jobs.app.service.CountryService;
-import com.jobs.app.service.SectorService;
-import com.jobs.app.service.UserService;
+import com.jobs.app.service.*;
 import com.jobs.app.util.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -42,6 +39,12 @@ public class RouteController {
 
     @Autowired
     private SectorService sectorService;
+
+    @Autowired
+    private DayRepository dayRepository;
+
+    @Autowired
+    private ConsultantService consultantService;
 
     @RequestMapping(value = {"/", "/logout"})
     private String login(Model model) {
@@ -95,6 +98,46 @@ public class RouteController {
             return result;
         }
 
+        model.addAttribute("days", dayRepository.findByOrderByIdAsc());
+        model.addAttribute("newAvailabilityDTO", new ConsultantAvailabilityDTO());
+        model.addAttribute("availabilities", availabilityRepository.findAllByConsultantAndDayExcludingCode(user));
+        return "availability-view";
+    }
+
+    @RequestMapping(value = "/add-availability")
+    private String addConsultantAvailability(
+        @RequestParam Integer user,
+        @ModelAttribute("newAvailabilityDTO") ConsultantAvailabilityDTO consultantAvailabilityDTO,
+        Model model
+    ) {
+        String result = getBase(model, user);
+        if (Objects.nonNull(result)) {
+            return result;
+        }
+
+        boolean isError = true;
+        String errorMsg = "";
+
+        if (StringUtils.isEmptyOrWhitespace(consultantAvailabilityDTO.getAvailableFrom())) {
+            errorMsg = "Available from time not set";
+        } else if (StringUtils.isEmptyOrWhitespace(consultantAvailabilityDTO.getAvailableTo())) {
+            errorMsg = "Available to time not set";
+        } else if (!consultantAvailabilityDTO.getAvailableFrom().matches("^([0-1][0-9]|2[0-4]):([0-5][0-9])$")) {
+            errorMsg = "Available from time is invalid. Time format should be in 24 hrs (HH:mm)";
+        } else if (!consultantAvailabilityDTO.getAvailableTo().matches("^([0-1][0-9]|2[0-4]):([0-5][0-9])$")) {
+            errorMsg = "Available end time is invalid. Time format should be in 24 hrs (HH:mm)";
+        } else {
+            isError = false;
+        }
+
+        includeError(model, isError, errorMsg);
+        if (!isError) {
+            consultantAvailabilityDTO.setConsultant(user + "");
+            isError = Objects.isNull(consultantService.saveConsultantAvailability(model, consultantAvailabilityDTO));
+        }
+
+        model.addAttribute("days", dayRepository.findByOrderByIdAsc());
+        model.addAttribute("newAvailabilityDTO", isError ? consultantAvailabilityDTO : new ConsultantAvailabilityDTO());
         model.addAttribute("availabilities", availabilityRepository.findAllByConsultantAndDayExcludingCode(user));
         return "availability-view";
     }
@@ -147,6 +190,8 @@ public class RouteController {
             availabilityRepository.deleteById(availability);
         }
 
+        model.addAttribute("newAvailabilityDTO", new ConsultantAvailabilityDTO());
+        model.addAttribute("days", dayRepository.findByOrderByIdAsc());
         model.addAttribute("availabilities", availabilityRepository.findAllByConsultantAndDayExcludingCode(user));
         return "availability-view";
     }

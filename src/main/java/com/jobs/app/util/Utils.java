@@ -56,6 +56,9 @@ public class Utils {
 
     public static String convertTimeIntValueToTime(Integer timeInInt) {
         String timeInString = timeInInt.toString();
+        if (timeInString.length() == 3) {
+            return "0" + timeInString.charAt(0) + ":" + timeInString.substring(1, 3);
+        }
         return timeInString.substring(0, 2) + ":" + timeInString.substring(2, 4);
     }
 
