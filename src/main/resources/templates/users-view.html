@@ -9,46 +9,45 @@
         crossorigin="anonymous">
 
   <style>
+    .sidenav {
+      height: 100%;
+      width: 0;
+      position: fixed;
+      z-index: 1;
+      top: 0;
+      left: 0;
+      background-color: #111;
+      overflow-x: hidden;
+      transition: 0.5s;
+      padding-top: 60px;
+    }
 
-  .sidenav {
-    height: 100%;
-    width: 0;
-    position: fixed;
-    z-index: 1;
-    top: 0;
-    left: 0;
-    background-color: #111;
-    overflow-x: hidden;
-    transition: 0.5s;
-    padding-top: 60px;
-  }
+    .sidenav a {
+      padding: 8px 8px 8px 32px;
+      text-decoration: none;
+      font-size: 25px;
+      color: #818181;
+      display: block;
+      transition: 0.3s;
+    }
 
-  .sidenav a {
-    padding: 8px 8px 8px 32px;
-    text-decoration: none;
-    font-size: 25px;
-    color: #818181;
-    display: block;
-    transition: 0.3s;
-  }
+    .sidenav a:hover {
+      color: #f1f1f1;
+    }
 
-  .sidenav a:hover {
-    color: #f1f1f1;
-  }
+    .sidenav .closebtn {
+      position: absolute;
+      top: 0;
+      right: 25px;
+      font-size: 36px;
+      margin-left: 50px;
+    }
 
-  .sidenav .closebtn {
-    position: absolute;
-    top: 0;
-    right: 25px;
-    font-size: 36px;
-    margin-left: 50px;
-  }
-
-  @media screen and (max-height: 450px) {
-    .sidenav {padding-top: 15px;}
-    .sidenav a {font-size: 18px;}
-  }
-</style>
+    @media screen and (max-height: 450px) {
+      .sidenav {padding-top: 15px;}
+      .sidenav a {font-size: 18px;}
+    }
+  </style>
 
 </head>
 <body>
@@ -78,24 +77,25 @@
 
 
 <div class="container">
+  <br th:if="${isError}">
+  <div th:if="${isError}">
+    <div class="alert alert-danger" th:text="${errorMsg}">Invalid Email or Password</div>
+  </div>
   <br>
+
   <table class="table table-bordered table-hover">
     <thead class="table-dark">
     <tr>
-      <th>Consultant name</th>
-      <th>Country of residence</th>
-      <th>Sector</th>
-      <th th:if = "${permissions.canBookAppointment}"></th>
+      <th>Full name</th>
+      <th>Address</th>
+      <th>Email</th>
     </tr>
     </thead>
     <tbody>
-    <tr th:each = "consultant : ${consultants}">
-      <td th:text = "${consultant.firstName + ' ' + consultant.lastName}"></td>
-      <td th:text = "${consultant.country}"></td>
-      <td th:text = "${consultant.sector}"></td>
-      <td th:if = "${permissions.canBookAppointment}">
-        <a class="btn btn-info btn-md" th:href="@{${'/book-appointment?jobSeeker=' + userId + '&consultant=' + consultant.id}}">Book Appointment</a>
-      </td>
+    <tr th:each = "user : ${users}">
+      <td th:text = "${user.firstName + ' ' + user.lastName}"></td>
+      <td th:text = "${user.address}"></td>
+      <td th:text = "${user.email}"></td>
     </tr>
     </tbody>
   </table>

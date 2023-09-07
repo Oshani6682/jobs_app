@@ -66,13 +66,14 @@
     <a th:href="@{${'/dashboard/' + userId}}">Appointments</a>
 
     <a th:if="${permissions.hasConsultantView}" th:href="@{${'/consultants-view/' + userId}}">Consultants</a>
+    <a th:if="${permissions.hasAdminView}" th:href="@{${'/users?user=' + userId + '&view=admin'}}">Sys Admins</a>
+    <a th:if="${permissions.hasManagerView}" th:href="@{${'/users?user=' + userId + '&view=manager'}}">Managers</a>
 
     <a th:if="${permissions.canCreateUsers}" th:href="@{${'/register-user?user=' + userId + '&userRole=consultant'}}">Create Consultant</a>
+    <a th:if="${permissions.canCreateUsers}" th:href="@{${'/register-user?user=' + userId + '&userRole=admin'}}">Create Admin</a>
+    <a th:if="${permissions.canCreateUsers}" th:href="@{${'/register-user?user=' + userId + '&userRole=manager'}}">Create Manager</a>
 
     <a th:if="${permissions.canAddAvailability}" th:href="@{${'/consultant-availability?user=' + userId}}">My Availability</a>
-
-    <a th:if="${user.userRole=='MANAGER'}" href="#">Clients</a>
-    <a th:if="${user.userRole=='MANAGER'}" href="#">Contact</a>
 </div>
 
 

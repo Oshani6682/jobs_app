@@ -104,6 +104,26 @@ public class RouteController {
         return "availability-view";
     }
 
+    @RequestMapping(value = "/users")
+    private String getUsersView(
+        @RequestParam Integer user,
+        @RequestParam String view,
+        Model model
+    ) {
+        String result = getBase(model, user);
+        if (Objects.nonNull(result)) {
+            return result;
+        }
+
+        UserRole matchRole = Utils.findMatchingUserRole(view);
+        if (Objects.isNull(matchRole) || (matchRole != UserRole.ADMIN && matchRole != UserRole.MANAGER)) {
+            return "redirect:/";
+        }
+
+        model.addAttribute("users", userService.findAllUsers(matchRole));
+        return "users-view";
+    }
+
     @RequestMapping(value = "/add-availability")
     private String addConsultantAvailability(
         @RequestParam Integer user,
@@ -445,6 +465,8 @@ public class RouteController {
     private void setPermissions(Model model, User user) {
         Map<String, Boolean> permissions = new HashMap<>();
         permissions.put("hasConsultantView", user.userRole != UserRole.CONSULTANT);
+        permissions.put("hasAdminView", user.userRole == UserRole.ADMIN || user.userRole == UserRole.MANAGER);
+        permissions.put("hasManagerView", user.userRole == UserRole.ADMIN || user.userRole == UserRole.MANAGER);
         permissions.put("canBookAppointment", user.userRole == UserRole.JOB_SEEKER);
         permissions.put("canCancelAppointment", user.userRole == UserRole.JOB_SEEKER || user.userRole == UserRole.CONSULTANT);
         permissions.put("canCreateUsers", user.userRole == UserRole.ADMIN);
