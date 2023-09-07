@@ -74,7 +74,12 @@
 
 
 <div class="container">
+  <br th:if="${isError}">
+  <div th:if="${isError}">
+    <div class="alert alert-danger" th:text="${errorMsg}">Invalid Email or Password</div>
+  </div>
   <br>
+
   <table class="table table-bordered table-hover">
     <thead class="table-dark">
     <tr>
@@ -83,6 +88,7 @@
       <th>Appointment Date</th>
       <th>Time period</th>
       <th>Status</th>
+      <th th:if="${permissions.canCancelAppointment}"></th>
     </tr>
     </thead>
     <tbody>
@@ -92,6 +98,11 @@
       <td th:text = "${appointment.appointmentDate}"></td>
       <td th:text = "${appointment.startTime + ' to ' + appointment.endTime}"></td>
       <td th:text = "${appointment.status}"></td>
+      <td th:if = "${permissions.canCancelAppointment && appointment.status=='scheduled'}">
+        <a th:href="@{${'/cancel-appointment?user=' + userId + '&appointment=' + appointment.id}}" class="btn btn-info btn-md">Cancel</a>
+      </td>
+      <td th:if = "${permissions.canCancelAppointment && appointment.status!='scheduled'}">
+      </td>
     </tr>
     </tbody>
   </table>

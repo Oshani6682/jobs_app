@@ -22,10 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
 import java.math.BigInteger;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 public class AppointmentService {
@@ -43,6 +40,27 @@ public class AppointmentService {
 
     @Autowired
     private AppointmentRepository appointmentRepository;
+
+    public AppointmentDTO cancelAppointment(Model model, int userId, int appointmentId) {
+        LOGGER.info("Cancel appointment {} - Started", appointmentId);
+
+        Optional<Appointment> appointment = appointmentRepository.findById(appointmentId);
+        if (!appointment.isPresent()) {
+            includeError(model, "Appointment not found");
+            return null;
+        }
+
+        Appointment result = appointment.get();
+        if (result.status != AppointmentStatus.scheduled) {
+            includeError(model, "Cannot cancel the appointment as it is in " + result.status + " state");
+            return null;
+        }
+
+        result.status = AppointmentStatus.cancelled;
+        result = appointmentRepository.save(result);
+        LOGGER.info("Cancel appointment {} - Ended", appointmentId);
+        return new AppointmentDTO(result);
+    }
 
     public AppointmentDTO saveAppointment(Model model, CreateAppointmentDTO createAppointmentDTO) {
         LOGGER.info("Save appointment - Started");

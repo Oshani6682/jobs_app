@@ -95,6 +95,22 @@ public class RouteController {
         return "book-appointment-view";
     }
 
+    @RequestMapping(value = "/cancel-appointment")
+    private String cancelAppointment(
+        @RequestParam Integer user,
+        @RequestParam Integer appointment,
+        Model model
+    ) {
+        String result = getBase(model, user);
+        if (Objects.nonNull(result)) {
+            return result;
+        }
+
+        appointmentService.cancelAppointment(model, user, appointment);
+        model.addAttribute("appointments", appointmentService.findAppointments(user));
+        return "user-dashboard";
+    }
+
     @PostMapping(value = "/confirm-appointment")
     private String confirmAppointment(
         @RequestParam Integer jobSeeker,
@@ -213,6 +229,7 @@ public class RouteController {
         Map<String, Boolean> permissions = new HashMap<>();
         permissions.put("hasConsultantView", user.userRole != UserRole.CONSULTANT);
         permissions.put("canBookAppointment", user.userRole == UserRole.JOB_SEEKER);
+        permissions.put("canCancelAppointment", user.userRole == UserRole.JOB_SEEKER || user.userRole == UserRole.CONSULTANT);
         model.addAttribute("permissions", permissions);
     }
 
