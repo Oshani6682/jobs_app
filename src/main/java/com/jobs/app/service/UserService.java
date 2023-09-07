@@ -85,15 +85,15 @@ public class UserService {
         return new ConsultantDTO(consultant);
     }
 
-    private User saveUser(CreateUserDTO userDTO, UserRole userRole) {
-        LOGGER.info("Save new user - {}: {}", userRole.toString(), userDTO.getUsername());
+    public User saveUser(CreateUserDTO userDTO, UserRole userRole) {
+        LOGGER.info("Save new user - {}: {}", userRole, userDTO.getUsername());
         User user = new User(userDTO);
         user.userName = userDTO.getUsername();
         user.password = userDTO.getPassword();
         user.userRole = userRole;
 
         user = userRepository.save(user);
-        LOGGER.info("Save new user - {}: {} - Successful", userRole.toString(), user.userName);
+        LOGGER.info("Save new user - {}: {} - Successful", userRole, user.userName);
         return user;
     }
 

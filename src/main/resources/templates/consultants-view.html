@@ -81,7 +81,7 @@
       <th>Consultant name</th>
       <th>Country of residence</th>
       <th>Sector</th>
-      <th></th>
+      <th th:if = "${permissions.canBookAppointment}"></th>
     </tr>
     </thead>
     <tbody>

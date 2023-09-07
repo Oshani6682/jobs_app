@@ -67,7 +67,7 @@
 
   <a th:if="${permissions.hasConsultantView}" th:href="@{${'/consultants-view/' + userId}}">Consultants</a>
 
-  <a th:if="${user.userRole=='MANAGER'}" href="#">Services</a>
+  <a th:if="${permissions.canCreateUsers}" th:href="@{${'/register-user?user=' + userId + '&userRole=consultant'}}">Create Consultant</a>
   <a th:if="${user.userRole=='MANAGER'}" href="#">Clients</a>
   <a th:if="${user.userRole=='MANAGER'}" href="#">Contact</a>
 </div>

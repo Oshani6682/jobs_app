@@ -7,7 +7,10 @@ import com.jobs.app.repository.ConsultantAvailabilityRepository;
 import com.jobs.app.repository.ConsultantRepository;
 import com.jobs.app.repository.UserRepository;
 import com.jobs.app.service.AppointmentService;
+import com.jobs.app.service.CountryService;
+import com.jobs.app.service.SectorService;
 import com.jobs.app.service.UserService;
+import com.jobs.app.util.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -35,6 +38,12 @@ public class RouteController {
     @Autowired
     private ConsultantAvailabilityRepository availabilityRepository;
 
+    @Autowired
+    private CountryService countryService;
+
+    @Autowired
+    private SectorService sectorService;
+
     @RequestMapping(value = {"/", "/logout"})
     private String login(Model model) {
         model.addAttribute("loginDTO", new LoginDTO());
@@ -44,9 +53,8 @@ public class RouteController {
 
     @RequestMapping(value = "/signup")
     private String registration(Model model) {
+        includeError(model, false, "");
         model.addAttribute("registerDTO", new CreateUserDTO());
-        model.addAttribute("isError", false);
-        model.addAttribute("errorMsg", "");
         return "signup";
     }
 
@@ -109,6 +117,105 @@ public class RouteController {
         appointmentService.cancelAppointment(model, user, appointment);
         model.addAttribute("appointments", appointmentService.findAppointments(user));
         return "user-dashboard";
+    }
+
+    @RequestMapping(value = "/register-user")
+    private String getRegisterUserView(
+        @RequestParam Integer user,
+        @RequestParam String userRole,
+        Model model
+    ) {
+        String result = getBase(model, user);
+        if (Objects.nonNull(result)) {
+            return result;
+        }
+
+        UserRole matchRole = Utils.findMatchingUserRole(userRole);
+        if (Objects.isNull(matchRole) || matchRole == UserRole.JOB_SEEKER) {
+            return "redirect:/dashboard/" + user;
+        }
+
+        model.addAttribute("userDisplayRole", Utils.capitalizeEachLetter(matchRole.name()));
+        model.addAttribute("userRole", userRole);
+        model.addAttribute("registerDTO", new CreateConsultantDTO());
+
+        if (matchRole == UserRole.CONSULTANT) {
+            model.addAttribute("countries", countryService.findCountries());
+            model.addAttribute("sectors", sectorService.findSectors());
+        }
+
+        return "create-user";
+    }
+
+    @PostMapping(value = "/confirm-register")
+    private String confirmRegister(
+        @RequestParam Integer user,
+        @RequestParam String userRole,
+        @ModelAttribute("registerDTO") CreateConsultantDTO createUserDTO,
+        Model model
+    ) {
+        String result = getBase(model, user);
+        if (Objects.nonNull(result)) {
+            return result;
+        }
+
+        UserRole matchRole = Utils.findMatchingUserRole(userRole);
+        if (Objects.isNull(matchRole) || matchRole == UserRole.JOB_SEEKER) {
+            return "redirect:/dashboard/" + user;
+        }
+
+        boolean isError = true;
+        String errorMessage = "";
+
+        if (StringUtils.isEmptyOrWhitespace(createUserDTO.getUsername())) {
+            errorMessage = "Username cannot be empty";
+        } else if (StringUtils.isEmptyOrWhitespace(createUserDTO.getFirstName())) {
+            errorMessage = "First name cannot be empty";
+        } else if (StringUtils.isEmptyOrWhitespace(createUserDTO.getLastName())) {
+            errorMessage = "Last name cannot be empty";
+        } else if (StringUtils.isEmptyOrWhitespace(createUserDTO.getAddress())) {
+            errorMessage = "Address cannot be empty";
+        } else if (StringUtils.isEmptyOrWhitespace(createUserDTO.getEmail())) {
+            errorMessage = "Email cannot be empty";
+        } else if (StringUtils.isEmptyOrWhitespace(createUserDTO.getPassword())) {
+            errorMessage = "Password cannot be empty";
+        } else if (!createUserDTO.getEmail().matches("^[a-zA-Z0-9]+[a-zA-Z0-9._]+@[a-zA-Z.]+\\.[a-zA-Z]+$")) {
+            errorMessage = "Email address is invalid";
+        } else if (Objects.nonNull(userRepository.findUserByUsername(createUserDTO.getUsername()))) {
+            errorMessage = "Username already taken, try another one";
+        } else if (matchRole == UserRole.CONSULTANT
+            && createUserDTO.getCountry() <= 0
+        ) {
+            errorMessage = "Consultant country not selected";
+        }  else if (matchRole == UserRole.CONSULTANT
+            && createUserDTO.getSector() <= 0
+        ) {
+            errorMessage = "Consultant sector not selected";
+        } else {
+            isError = false;
+        }
+
+        if (isError) {
+            includeError(model, true, errorMessage);
+            model.addAttribute("userDisplayRole", Utils.capitalizeEachLetter(matchRole.name()));
+            model.addAttribute("userRole", userRole);
+            model.addAttribute("registerDTO", createUserDTO);
+
+            if (matchRole == UserRole.CONSULTANT) {
+                model.addAttribute("countries", countryService.findCountries());
+                model.addAttribute("sectors", sectorService.findSectors());
+            }
+
+            return "create-user";
+        }
+
+        if (matchRole == UserRole.CONSULTANT) {
+            userService.saveConsultant(createUserDTO);
+            return "redirect:/consultants-view/" + user;
+        } else {
+            userService.saveUser(createUserDTO, matchRole);
+            return "redirect:/dashboard/" + user;
+        }
     }
 
     @PostMapping(value = "/confirm-appointment")
@@ -230,6 +337,7 @@ public class RouteController {
         permissions.put("hasConsultantView", user.userRole != UserRole.CONSULTANT);
         permissions.put("canBookAppointment", user.userRole == UserRole.JOB_SEEKER);
         permissions.put("canCancelAppointment", user.userRole == UserRole.JOB_SEEKER || user.userRole == UserRole.CONSULTANT);
+        permissions.put("canCreateUsers", user.userRole == UserRole.ADMIN);
         model.addAttribute("permissions", permissions);
     }
 
