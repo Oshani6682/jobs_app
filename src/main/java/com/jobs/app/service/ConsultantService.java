@@ -92,7 +92,7 @@ public class ConsultantService {
 
     public List<ConsultantAvailabilityDTO> findConsultantAvailability(Integer consultantId) {
         LOGGER.info("Find consultant availability: {} - Started", consultantId);
-        userService.findConsultantById(consultantId, HttpStatus.BAD_REQUEST);
+        userService.findConsultantById(consultantId, HttpStatus.NOT_FOUND);
         return consultantAvailabilityRepository.findAllByConsultantAndDayExcludingCode(consultantId);
     }
 
