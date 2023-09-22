@@ -96,6 +96,10 @@ public class UserDTO {
         isActive = active;
     }
 
+    public Boolean getActive() {
+        return isActive;
+    }
+
     public UserRole getUserRole() {
         return userRole;
     }

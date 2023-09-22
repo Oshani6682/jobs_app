@@ -12,7 +12,7 @@ import java.util.List;
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
 
-    @Query(value = "select new com.jobs.app.dto.UserDTO(user) from User user where user.userRole=:userRole")
+    @Query(value = "select new com.jobs.app.dto.UserDTO(user) from User user where user.userRole=:userRole and user.isActive=true")
     List<UserDTO> findAllUsersByUserRole(UserRole userRole);
 
     @Query(value = "select new com.jobs.app.dto.UserDTO(user, true) from User user where user.userName=:username " +

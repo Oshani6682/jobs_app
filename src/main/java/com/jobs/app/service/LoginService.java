@@ -18,9 +18,10 @@ public class LoginService {
 
     public UserDTO login(LoginDTO loginDTO) {
         LOGGER.info("User login - Started");
-        return userRepository.findUserByUsernameAndPassword(
+        UserDTO dto = userRepository.findUserByUsernameAndPassword(
             loginDTO.getUsername(), loginDTO.getPassword()
         );
+        return dto.getActive() ? dto : null;
     }
 
 }

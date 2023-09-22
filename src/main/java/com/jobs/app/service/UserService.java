@@ -97,6 +97,16 @@ public class UserService {
         return user;
     }
 
+    public void removeUser(Integer removeUser) {
+        LOGGER.info("Remove user: {}", removeUser);
+
+        User user = userRepository.findById(removeUser).get();
+        user.isActive = false;
+        userRepository.save(user);
+
+        LOGGER.info("Remove user: {} - Successful", removeUser);
+    }
+
     public ConsultantDTO findConsultantById(Integer id, HttpStatus statusOnNotFound) {
         LOGGER.info("Find user - Consultant: {}", id);
 

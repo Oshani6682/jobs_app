@@ -78,6 +78,11 @@
 
 
 <div class="container">
+  <br th:if="${isError}">
+  <div th:if="${isError}">
+    <div class="alert alert-danger" th:text="${errorMsg}">Invalid Email or Password</div>
+  </div>
+
   <br>
   <table class="table table-bordered table-hover">
     <thead class="table-dark">
@@ -86,6 +91,7 @@
       <th>Country of residence</th>
       <th>Sector</th>
       <th th:if = "${permissions.canBookAppointment}"></th>
+      <th th:if="${permissions.canRemoveUsers}"></th>
     </tr>
     </thead>
     <tbody>
@@ -95,6 +101,10 @@
       <td th:text = "${consultant.sector}"></td>
       <td th:if = "${permissions.canBookAppointment}">
         <a class="btn btn-info btn-md" th:href="@{${'/book-appointment?jobSeeker=' + userId + '&consultant=' + consultant.id}}">Book Appointment</a>
+      </td>
+      <td th:if = "${permissions.canRemoveUsers}">
+        <a th:href="@{${'/remove-user?loggedUser=' + userId + '&removeUser=' + consultant.id + '&viewOf=CONSULTANT'}}"
+           class="btn btn-danger btn-md">Remove</a>
       </td>
     </tr>
     </tbody>

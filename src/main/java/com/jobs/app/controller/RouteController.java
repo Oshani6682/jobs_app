@@ -121,6 +121,7 @@ public class RouteController {
         }
 
         model.addAttribute("users", userService.findAllUsers(matchRole));
+        model.addAttribute("viewOf", matchRole);
         return "users-view";
     }
 
@@ -475,6 +476,59 @@ public class RouteController {
         return "redirect:/";
     }
 
+    @RequestMapping(value = "/remove-user")
+    private String removeUser(
+        @RequestParam Integer loggedUser,
+        @RequestParam Integer removeUser,
+        @RequestParam UserRole viewOf,
+        Model model
+    ) {
+        String result = getBase(model, loggedUser);
+        if (Objects.nonNull(result)) {
+            return result;
+        }
+
+        UserRole userRole = userRepository.findById(loggedUser).get().userRole;
+        boolean isError = true;
+
+        if (userRole != UserRole.ADMIN) {
+            includeError(model, true, "You don't have access to remove");
+            return "redirect:/dashboard/" + loggedUser;
+        } else if (Objects.equals(loggedUser, removeUser)) {
+            includeError(model, true, "You cannot remove your own account");
+        } else if (viewOf == UserRole.CONSULTANT) {
+            isError = false;
+
+            for (AppointmentDTO dto : appointmentService.findAppointments(removeUser)) {
+                if (dto.getStatus().contentEquals(AppointmentStatus.started.name())
+                    || dto.getStatus().contentEquals(AppointmentStatus.scheduled.name())
+                ) {
+                    isError = true;
+                    break;
+                }
+            }
+
+            if (isError) {
+                includeError(model, true, "Cannot remove consultant because there are ongoing appointments");
+            }
+        } else {
+            isError = false;
+        }
+
+        if (!isError) {
+            userService.removeUser(removeUser);
+        }
+
+        if (viewOf == UserRole.CONSULTANT) {
+            model.addAttribute("consultants", userService.findAllConsultants());
+            return "consultants-view";
+        }
+
+        model.addAttribute("users", userService.findAllUsers(viewOf));
+        model.addAttribute("viewOf", viewOf);
+        return "users-view";
+    }
+
     private String getBase(Model model, Integer userId) {
         Optional<User> user = userRepository.findById(userId);
         if (!user.isPresent()) {
@@ -502,6 +556,7 @@ public class RouteController {
         permissions.put("canFinishAppointment", user.userRole == UserRole.CONSULTANT);
         permissions.put("canActionOnAppointment", user.userRole == UserRole.JOB_SEEKER || user.userRole == UserRole.CONSULTANT);
         permissions.put("canCreateUsers", user.userRole == UserRole.ADMIN);
+        permissions.put("canRemoveUsers", user.userRole == UserRole.ADMIN);
         permissions.put("canAddAvailability", user.userRole == UserRole.CONSULTANT);
         model.addAttribute("permissions", permissions);
     }

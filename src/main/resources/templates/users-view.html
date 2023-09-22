@@ -89,6 +89,7 @@
       <th>Full name</th>
       <th>Address</th>
       <th>Email</th>
+      <th th:if="${permissions.canRemoveUsers}"></th>
     </tr>
     </thead>
     <tbody>
@@ -96,6 +97,10 @@
       <td th:text = "${user.firstName + ' ' + user.lastName}"></td>
       <td th:text = "${user.address}"></td>
       <td th:text = "${user.email}"></td>
+      <td th:if = "${permissions.canRemoveUsers && user.id != userId}">
+        <a th:href="@{${'/remove-user?loggedUser=' + userId + '&removeUser=' + user.id + '&viewOf=' + viewOf}}"
+           class="btn btn-danger btn-md">Remove</a>
+      </td>
     </tr>
     </tbody>
   </table>

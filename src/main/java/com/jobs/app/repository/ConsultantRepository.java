@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface ConsultantRepository extends JpaRepository<Consultant, Integer> {
 
-    @Query("select new com.jobs.app.dto.ConsultantDTO(consultant) from Consultant consultant")
+    @Query("select new com.jobs.app.dto.ConsultantDTO(consultant) from Consultant consultant where consultant.user.isActive=true")
     List<ConsultantDTO> findAllConsultants();
 
     @Query("select new com.jobs.app.dto.ConsultantDTO(consultant) from Consultant consultant where consultant.id=:consultantId")
