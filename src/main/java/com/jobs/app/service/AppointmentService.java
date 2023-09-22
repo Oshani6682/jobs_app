@@ -41,6 +41,48 @@ public class AppointmentService {
     @Autowired
     private AppointmentRepository appointmentRepository;
 
+    public AppointmentDTO startAppointment(Model model, int userId, int appointmentId) {
+        LOGGER.info("Start appointment {} - Started", appointmentId);
+
+        Optional<Appointment> appointment = appointmentRepository.findById(appointmentId);
+        if (!appointment.isPresent()) {
+            includeError(model, "Appointment not found");
+            return null;
+        }
+
+        Appointment result = appointment.get();
+        if (result.status != AppointmentStatus.scheduled) {
+            includeError(model, "Cannot start the appointment as it is in " + result.status + " state");
+            return null;
+        }
+
+        result.status = AppointmentStatus.started;
+        result = appointmentRepository.save(result);
+        LOGGER.info("Start appointment {} - Ended", appointmentId);
+        return new AppointmentDTO(result);
+    }
+
+    public AppointmentDTO finishAppointment(Model model, int userId, int appointmentId) {
+        LOGGER.info("Finish appointment {} - Started", appointmentId);
+
+        Optional<Appointment> appointment = appointmentRepository.findById(appointmentId);
+        if (!appointment.isPresent()) {
+            includeError(model, "Appointment not found");
+            return null;
+        }
+
+        Appointment result = appointment.get();
+        if (result.status != AppointmentStatus.started) {
+            includeError(model, "Cannot finish the appointment as it is in " + result.status + " state");
+            return null;
+        }
+
+        result.status = AppointmentStatus.finished;
+        result = appointmentRepository.save(result);
+        LOGGER.info("Finish appointment {} - Ended", appointmentId);
+        return new AppointmentDTO(result);
+    }
+
     public AppointmentDTO cancelAppointment(Model model, int userId, int appointmentId) {
         LOGGER.info("Cancel appointment {} - Started", appointmentId);
 

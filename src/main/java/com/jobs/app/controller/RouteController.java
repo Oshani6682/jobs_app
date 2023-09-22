@@ -233,10 +233,11 @@ public class RouteController {
         return "book-appointment-view";
     }
 
-    @RequestMapping(value = "/cancel-appointment")
-    private String cancelAppointment(
+    @RequestMapping(value = "/perform-appointment")
+    private String performAppointment(
         @RequestParam Integer user,
         @RequestParam Integer appointment,
+        @RequestParam AppointmentStatus status,
         Model model
     ) {
         String result = getBase(model, user);
@@ -244,7 +245,13 @@ public class RouteController {
             return result;
         }
 
-        appointmentService.cancelAppointment(model, user, appointment);
+        if (status == AppointmentStatus.cancelled) {
+            appointmentService.cancelAppointment(model, user, appointment);
+        } else if (status == AppointmentStatus.started) {
+            appointmentService.startAppointment(model, user, appointment);
+        } else if (status == AppointmentStatus.finished) {
+            appointmentService.finishAppointment(model, user, appointment);
+        }
         model.addAttribute("appointments", appointmentService.findAppointments(user));
         return "user-dashboard";
     }
@@ -468,7 +475,10 @@ public class RouteController {
         permissions.put("hasAdminView", user.userRole == UserRole.ADMIN || user.userRole == UserRole.MANAGER);
         permissions.put("hasManagerView", user.userRole == UserRole.ADMIN || user.userRole == UserRole.MANAGER);
         permissions.put("canBookAppointment", user.userRole == UserRole.JOB_SEEKER);
+        permissions.put("canStartAppointment", user.userRole == UserRole.CONSULTANT);
         permissions.put("canCancelAppointment", user.userRole == UserRole.JOB_SEEKER || user.userRole == UserRole.CONSULTANT);
+        permissions.put("canFinishAppointment", user.userRole == UserRole.CONSULTANT);
+        permissions.put("canActionOnAppointment", user.userRole == UserRole.JOB_SEEKER || user.userRole == UserRole.CONSULTANT);
         permissions.put("canCreateUsers", user.userRole == UserRole.ADMIN);
         permissions.put("canAddAvailability", user.userRole == UserRole.CONSULTANT);
         model.addAttribute("permissions", permissions);

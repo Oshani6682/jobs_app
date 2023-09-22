@@ -92,7 +92,7 @@
       <th>Appointment Date</th>
       <th>Time period</th>
       <th>Status</th>
-      <th th:if="${permissions.canCancelAppointment}"></th>
+      <th th:if="${permissions.canActionOnAppointment}"></th>
     </tr>
     </thead>
     <tbody>
@@ -102,10 +102,18 @@
       <td th:text = "${appointment.appointmentDate}"></td>
       <td th:text = "${appointment.startTime + ' to ' + appointment.endTime}"></td>
       <td th:text = "${appointment.status}"></td>
-      <td th:if = "${permissions.canCancelAppointment && appointment.status=='scheduled'}">
-        <a th:href="@{${'/cancel-appointment?user=' + userId + '&appointment=' + appointment.id}}" class="btn btn-danger btn-md">Cancel</a>
+      <td th:if = "${permissions.canActionOnAppointment}">
+        <a th:if = "${permissions.canStartAppointment && appointment.status=='scheduled'}"
+           th:href="@{${'/perform-appointment?user=' + userId + '&appointment=' + appointment.id + '&status=started'}}"
+           class="btn btn-success btn-md">Start</a>
+        <a th:if = "${permissions.canCancelAppointment && appointment.status=='scheduled'}"
+           th:href="@{${'/perform-appointment?user=' + userId + '&appointment=' + appointment.id + '&status=cancelled'}}"
+           class="btn btn-danger btn-md">Cancel</a>
+        <a th:if = "${permissions.canFinishAppointment && appointment.status=='started'}"
+           th:href="@{${'/perform-appointment?user=' + userId + '&appointment=' + appointment.id + '&status=finished'}}"
+           class="btn btn-success btn-md">Finish</a>
       </td>
-      <td th:if = "${permissions.canCancelAppointment && appointment.status!='scheduled'}">
+<!--      <td th:if = "${permissions.canCancelAppointment && appointment.status!='scheduled'}">-->
       </td>
     </tr>
     </tbody>
