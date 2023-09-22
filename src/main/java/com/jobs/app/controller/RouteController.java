@@ -251,9 +251,31 @@ public class RouteController {
             appointmentService.startAppointment(model, user, appointment);
         } else if (status == AppointmentStatus.finished) {
             appointmentService.finishAppointment(model, user, appointment);
+
+            AppointmentRatingDTO ratingDTO = new AppointmentRatingDTO();
+            model.addAttribute("appointment", appointment);
+            model.addAttribute("ratingDTO", ratingDTO);
+            return "appointment-feedback";
         }
         model.addAttribute("appointments", appointmentService.findAppointments(user));
         return "user-dashboard";
+    }
+
+    @RequestMapping(value = "/rate-appointment")
+    private String rateAppointment(
+        @RequestParam Integer user,
+        @RequestParam Integer appointment,
+        @ModelAttribute("ratingDTO") AppointmentRatingDTO ratingDTO,
+        Model model
+    ) {
+        String result = getBase(model, user);
+        if (Objects.nonNull(result)) {
+            return result;
+        }
+
+        ratingDTO.setAppointmentId(appointment);
+        appointmentService.rateAppointment(ratingDTO);
+        return "redirect:/dashboard/" + user;
     }
 
     @RequestMapping(value = "/register-user")

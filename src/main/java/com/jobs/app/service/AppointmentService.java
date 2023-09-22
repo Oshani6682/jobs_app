@@ -1,18 +1,17 @@
 package com.jobs.app.service;
 
 import com.jobs.app.domain.Appointment;
+import com.jobs.app.domain.AppointmentRating;
 import com.jobs.app.domain.User;
 import com.jobs.app.dto.AppointmentDTO;
+import com.jobs.app.dto.AppointmentRatingDTO;
 import com.jobs.app.dto.ConsultantAvailabilityDTO;
 import com.jobs.app.dto.CreateAppointmentDTO;
 import com.jobs.app.enums.AppointmentStatus;
 import com.jobs.app.enums.ErrorCodes;
 import com.jobs.app.enums.UserRole;
 import com.jobs.app.exception.JobApiException;
-import com.jobs.app.repository.AppointmentRepository;
-import com.jobs.app.repository.ConsultantAvailabilityRepository;
-import com.jobs.app.repository.ConsultantRepository;
-import com.jobs.app.repository.UserRepository;
+import com.jobs.app.repository.*;
 import com.jobs.app.util.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +30,9 @@ public class AppointmentService {
 
     @Autowired
     private ConsultantAvailabilityRepository consultantAvailabilityRepository;
+
+    @Autowired
+    private AppointmentRatingRepository ratingRepository;
 
     @Autowired
     private ConsultantRepository consultantRepository;
@@ -234,6 +236,23 @@ public class AppointmentService {
             return appointmentRepository.findAllAppointmentsOfConsultant(userId);
         }
         return appointmentRepository.findAllAppointments();
+    }
+
+    public void rateAppointment(AppointmentRatingDTO ratingDTO) {
+        LOGGER.info("Rate appointment - Started");
+
+        if (Objects.isNull(ratingRepository.findByAppointmentId(ratingDTO.getAppointmentId()))) {
+            AppointmentRating rating = new AppointmentRating();
+            rating.appointment = new Appointment();
+            rating.appointment.id = ratingDTO.getAppointmentId();
+            rating.consultantRating = ratingDTO.getConsultantRating();
+            rating.consultantRemarks = ratingDTO.getConsultantRemarks();
+            rating.appointmentRating = ratingDTO.getAppointmentRating();
+            rating.appointmentRemarks = ratingDTO.getAppointmentRemarks();
+            ratingRepository.save(rating);
+        }
+
+        LOGGER.info("Rate appointment - Ended");
     }
 
     private boolean includeError(Model model, String errorMsg) {

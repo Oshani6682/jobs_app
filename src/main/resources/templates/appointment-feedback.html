@@ -1,0 +1,87 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<head>
+    <title>Title</title>
+</head>
+<body>
+<div id="Signup">
+    <div th:if="${isError}">
+        <div class="alert alert-danger" th:text="${errorMsg}">Invalid Email or Password</div>
+    </div>
+
+    <h3 class="text-center text-white pt-5">Appointment Feedback</h3>
+    <div class="container">
+        <div id="login-row" class="row justify-content-center align-items-center">
+            <div id="login-column" class="col-md-6" style="margin-top: -2%">
+                <div id="login-box" class="col-md-12" style="margin-top: -2%">
+
+                    <form
+                        id="login-form" class="form"
+                        th:action="@{${'/rate-appointment?user=' + userId + '&appointment=' + appointment}}" method="post"
+                        th:object="${ratingDTO}"
+                    >
+
+                        <h3 class="text-center text-info" style="margin-top: -2%">Appointment Feedback</h3>
+                        <br>
+
+                        <div class="form-group">
+                            <label for="ConsRateList" class="text-info">Rate the Appointment: </label>
+                            <select id="ConsRateList" name="cars" th:field="*{appointmentRating}">
+                                <option th:value="1">Very Bad</option>
+                                <option th:value="2">Bad</option>
+                                <option th:value="3">Neutral</option>
+                                <option th:value="4">Good</option>
+                                <option th:value="5">Very Good</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="appRate" class="text-info">Feedback on Appointment: </label><br>
+                            <input type="text" th:field="*{appointmentRemarks}" name="appRate" id="appRate" class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="AppRateList" class="text-info">Rate the consultant: </label>
+                            <select id="AppRateList" name="cars" th:field="*{consultantRating}">
+                                <option th:value="1">Very Bad</option>
+                                <option th:value="2">Bad</option>
+                                <option th:value="3">Neutral</option>
+                                <option th:value="4">Good</option>
+                                <option th:value="5">Very Good</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="consRate" class="text-info">Feedback on Consultant: </label><br>
+                            <input type="text" th:field="*{consultantRemarks}" name="consRate" id="consRate" class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <input type="submit" name="CreateAccount" class="btn btn-info btn-md" value="submit">
+                            <a th:href="@{${'/dashboard/' + userId}}"
+                               class="btn btn-warning btn-md">skip</a>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+function openNav() {
+  document.getElementById("mySidenav").style.width = "250px";
+}
+
+function closeNav() {
+  document.getElementById("mySidenav").style.width = "0";
+}
+</script>
+</body>
+</html>
